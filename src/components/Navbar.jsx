@@ -1,15 +1,42 @@
-import { Link } from "react-router-dom";
+import { NavLink } from "react-router-dom";
+import ThemeToggle from "./ThemeToggle";
 
 function Navbar() {
   return (
-    <nav className="nav">
+    <nav className="navbar">
+      <span className="navbar__brand">DevProfile</span>
 
-      <Link className="link" to="/">Home</Link>
-      <Link className="link" to="/editor">Editor</Link>
-      <Link className="link" to="/dashboard">Dashboard</Link>
-      <Link className="link" to="/preview">Preview</Link>
-      <Link className="link" to="/about">About</Link>
+      <ul className="navbar__links">
+        <li>
+          <NavLink className={({ isActive }) => `navbar__link ${isActive ? "navbar__link--active" : ""}`} to="/">
+            Inicio
+          </NavLink>
+        </li>
+        <li>
+          <NavLink className={({ isActive }) => `navbar__link ${isActive ? "navbar__link--active" : ""}`} to="/editor">
+            Editor
+          </NavLink>
+        </li>
+        <li>
+          <NavLink className={({ isActive }) => `navbar__link ${isActive ? "navbar__link--active" : ""}`} to="/dashboard">
+            Dashboard
+          </NavLink>
+        </li>
+        <li>
+          <NavLink className={({ isActive }) => `navbar__link ${isActive ? "navbar__link--active" : ""}`} to="/preview">
+            Preview
+          </NavLink>
+        </li>
+        <li>
+          <NavLink className={({ isActive }) => `navbar__link ${isActive ? "navbar__link--active" : ""}`} to="/about">
+            Acerca de
+          </NavLink>
+        </li>
+      </ul>
 
+      <div className="navbar__actions">
+        <ThemeToggle />
+      </div>
     </nav>
   );
 }

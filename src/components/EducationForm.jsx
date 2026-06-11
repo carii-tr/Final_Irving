@@ -8,109 +8,166 @@ function EducationForm() {
   const { validate } = useFormValidation();
 
   const [form, setForm] = useState({
-    institucion: "",
-    programa: "",
-    periodo: "",
-    descripcion: "",
-    evidencia: ""
+    institucion: "", programa: "", periodo: "", descripcion: "", evidencia: "",
   });
-
   const [editingId, setEditingId] = useState(null);
   const [errors, setErrors] = useState({});
+  const [toast, setToast] = useState(null);
+
+  const showToast = (message, type = "success") => {
+    setToast({ message, type });
+    setTimeout(() => setToast(null), 3000);
+  };
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
+    if (errors[e.target.name]) setErrors({ ...errors, [e.target.name]: null });
   };
 
   const resetForm = () => {
-    setForm({
-      institucion: "",
-      programa: "",
-      periodo: "",
-      descripcion: "",
-      evidencia: ""
-    });
+    setForm({ institucion: "", programa: "", periodo: "", descripcion: "", evidencia: "" });
     setEditingId(null);
     setErrors({});
   };
 
-  const addEducation = (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
-
     const validationErrors = validate("education", form, cvData.education);
     setErrors(validationErrors);
     if (Object.keys(validationErrors).length > 0) return;
 
-    setCvData(prev => ({
-      ...prev,
-      education: [...prev.education, { id: uuid(), ...form }]
-    }));
-
+    if (editingId) {
+      setCvData(prev => ({
+        ...prev,
+        education: prev.education.map(e => e.id === editingId ? { ...e, ...form } : e),
+      }));
+      showToast(`"${form.programa}" actualizado.`);
+    } else {
+      setCvData(prev => ({
+        ...prev,
+        education: [...prev.education, { id: uuid(), ...form }],
+      }));
+      showToast(`"${form.programa}" agregado.`);
+    }
     resetForm();
   };
 
-  const editEducation = (item) => {
+  const handleEdit = (item) => {
     setForm(item);
     setEditingId(item.id);
+    setErrors({});
   };
 
-  const updateEducation = (e) => {
-    e.preventDefault();
-
-    const validationErrors = validate("education", form, cvData.education);
-    setErrors(validationErrors);
-    if (Object.keys(validationErrors).length > 0) return;
-
-    setCvData(prev => ({
-      ...prev,
-      education: prev.education.map(e =>
-        e.id === editingId ? { ...e, ...form } : e
-      )
-    }));
-
-    resetForm();
-  };
-
-  const deleteEducation = (id) => {
-    setCvData(prev => ({
-      ...prev,
-      education: prev.education.filter(e => e.id !== id)
-    }));
+  const handleDelete = (item) => {
+    if (!window.confirm(`¿Eliminar "${item.programa}"?`)) return;
+    setCvData(prev => ({ ...prev, education: prev.education.filter(e => e.id !== item.id) }));
+    showToast(`"${item.programa}" eliminado.`, "info");
+    if (editingId === item.id) resetForm();
   };
 
   return (
     <div className="form-section">
-      <form className="form form--education" onSubmit={editingId ? updateEducation : addEducation}>
-        <h2 className="form__title">Educación</h2>
+      {toast && <div className={`toast toast--${toast.type}`}>{toast.message}</div>}
 
-        <input className="form__input" name="institucion" value={form.institucion} onChange={handleChange} />
-        {errors.institucion && <p className="form__error">{errors.institucion}</p>}
+      <form className="form form--education" onSubmit={handleSubmit} noValidate>
+        <h2 className="form__title">Educación y certificaciones</h2>
 
-        <input className="form__input" name="programa" value={form.programa} onChange={handleChange} />
-        {errors.programa && <p className="form__error">{errors.programa}</p>}
+        <div className="form__group">
+          <label className="form__label" htmlFor="edu-institucion">Institución *</label>
+          <input
+            className={`form__input ${errors.institucion ? "form__input--error" : ""}`}
+            id="edu-institucion"
+            name="institucion"
+            placeholder="Ej: Universidad de Guadalajara, Platzi..."
+            value={form.institucion}
+            onChange={handleChange}
+          />
+          {errors.institucion && <p className="form__error">{errors.institucion}</p>}
+        </div>
 
-        <input className="form__input" name="periodo" value={form.periodo} onChange={handleChange} />
-        {errors.periodo && <p className="form__error">{errors.periodo}</p>}
+        <div className="form__group">
+          <label className="form__label" htmlFor="edu-programa">Programa o certificación *</label>
+          <input
+            className={`form__input ${errors.programa ? "form__input--error" : ""}`}
+            id="edu-programa"
+            name="programa"
+            placeholder="Ej: Ingeniería en Sistemas, Curso de React..."
+            value={form.programa}
+            onChange={handleChange}
+          />
+          {errors.programa && <p className="form__error">{errors.programa}</p>}
+        </div>
 
-        <input className="form__input" name="descripcion" value={form.descripcion} onChange={handleChange} />
+        <div className="form__group">
+          <label className="form__label" htmlFor="edu-periodo">Periodo *</label>
+          <input
+            className={`form__input ${errors.periodo ? "form__input--error" : ""}`}
+            id="edu-periodo"
+            name="periodo"
+            placeholder="Ej: 2020 - 2024, Enero 2023..."
+            value={form.periodo}
+            onChange={handleChange}
+          />
+          {errors.periodo && <p className="form__error">{errors.periodo}</p>}
+        </div>
 
-        <button className="form__button" type="submit">
-          {editingId ? "Actualizar" : "Agregar"}
-        </button>
+        <div className="form__group">
+          <label className="form__label" htmlFor="edu-descripcion">Descripción</label>
+          <textarea
+            className={`form__textarea ${errors.descripcion ? "form__input--error" : ""}`}
+            id="edu-descripcion"
+            name="descripcion"
+            placeholder="Descripción breve del programa o lo aprendido..."
+            value={form.descripcion}
+            onChange={handleChange}
+            rows={3}
+          />
+          {errors.descripcion && <p className="form__error">{errors.descripcion}</p>}
+        </div>
+
+        <div className="form__group">
+          <label className="form__label" htmlFor="edu-evidencia">Enlace de evidencia</label>
+          <input
+            className={`form__input ${errors.evidencia ? "form__input--error" : ""}`}
+            id="edu-evidencia"
+            name="evidencia"
+            placeholder="https://certificado.com/mi-certificado"
+            value={form.evidencia}
+            onChange={handleChange}
+          />
+          {errors.evidencia && <p className="form__error">{errors.evidencia}</p>}
+        </div>
+
+        <div className="form__actions">
+          <button className="form__button form__button--primary" type="submit">
+            {editingId ? "Actualizar" : "Agregar"}
+          </button>
+          {editingId && (
+            <button className="form__button form__button--secondary" type="button" onClick={resetForm}>
+              Cancelar
+            </button>
+          )}
+        </div>
       </form>
 
-      <div className="list list--education">
-        {cvData.education.map(e => (
-          <div className="list__item" key={e.id}>
-            <span>{e.institucion}</span>
-
-            <div className="list__actions">
-              <button onClick={() => editEducation(e)}>Editar</button>
-              <button onClick={() => deleteEducation(e.id)}>Eliminar</button>
+      {cvData.education.length > 0 && (
+        <div className="list list--education">
+          <h3 className="list__title">Educación registrada ({cvData.education.length})</h3>
+          {cvData.education.map(e => (
+            <div className={`list__item ${editingId === e.id ? "list__item--editing" : ""}`} key={e.id}>
+              <div className="list__item-info">
+                <span className="list__item-name">{e.programa}</span>
+                <span className="list__item-tag">{e.institucion}</span>
+                {e.periodo && <span className="list__item-meta">{e.periodo}</span>}
+              </div>
+              <div className="list__item-actions">
+                <button className="list__button list__button--edit" onClick={() => handleEdit(e)}>Editar</button>
+                <button className="list__button list__button--delete" onClick={() => handleDelete(e)}>Eliminar</button>
+              </div>
             </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
