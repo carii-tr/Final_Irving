@@ -9,6 +9,7 @@ function PersonalForm() {
   const [form, setForm] = useState(cvData.personal);
   const [errors, setErrors] = useState({});
   const [toast, setToast] = useState(null);
+  const [imgError, setImgError] = useState(false);
 
   const showToast = (message, type = "success") => {
     setToast({ message, type });
@@ -17,9 +18,35 @@ function PersonalForm() {
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
-    if (errors[e.target.name]) {
-      setErrors({ ...errors, [e.target.name]: null });
+    if (errors[e.target.name]) setErrors({ ...errors, [e.target.name]: null });
+    // Al cambiar la URL de imagen manualmente, resetear error de carga
+    if (e.target.name === "imagen") setImgError(false);
+  };
+
+  // Maneja la carga de archivo desde el equipo
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    // Validar que sea imagen
+    if (!file.type.startsWith("image/")) {
+      setErrors({ ...errors, imagen: "El archivo debe ser una imagen (JPG, PNG, WEBP...)." });
+      return;
     }
+
+    // Validar tamaño máximo 5MB
+    if (file.size > 5 * 1024 * 1024) {
+      setErrors({ ...errors, imagen: "La imagen no debe superar 5MB." });
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      setForm((prev) => ({ ...prev, imagen: ev.target.result }));
+      setImgError(false);
+      setErrors((prev) => ({ ...prev, imagen: null }));
+    };
+    reader.readAsDataURL(file);
   };
 
   const handleSubmit = (e) => {
@@ -30,16 +57,24 @@ function PersonalForm() {
       showToast("Corrige los errores antes de guardar.", "error");
       return;
     }
-    setCvData(prev => ({ ...prev, personal: form }));
+    setCvData((prev) => ({ ...prev, personal: form }));
     showToast("Datos personales guardados correctamente.");
   };
+
+  const handleRemoveImage = () => {
+    setForm((prev) => ({ ...prev, imagen: "" }));
+    setImgError(false);
+    setErrors((prev) => ({ ...prev, imagen: null }));
+  };
+
+  // Determina si la imagen actual es un base64 (subida) o URL externa
+  const isBase64 = form.imagen && form.imagen.startsWith("data:");
+  const hasValidImage = form.imagen && !imgError;
 
   return (
     <div className="form-section">
       {toast && (
-        <div className={`toast toast--${toast.type}`}>
-          {toast.message}
-        </div>
+        <div className={`toast toast--${toast.type}`}>{toast.message}</div>
       )}
 
       <form className="form form--personal" onSubmit={handleSubmit} noValidate>
@@ -117,7 +152,7 @@ function PersonalForm() {
             className="form__textarea"
             id="descripcion"
             name="descripcion"
-            placeholder="Breve descripción de tu perfil, experiencia y objetivos profesionales..."
+            placeholder="Breve descripción de tu perfil, experiencia y objetivos..."
             value={form.descripcion}
             onChange={handleChange}
             rows={4}
@@ -150,20 +185,62 @@ function PersonalForm() {
           {errors.linkedin && <p className="form__error">{errors.linkedin}</p>}
         </div>
 
+        {/* ── IMAGEN DE PERFIL ── */}
         <div className="form__group">
-          <label className="form__label" htmlFor="imagen">URL de imagen de perfil</label>
+          <label className="form__label">Imagen de perfil</label>
+
+          {/* Vista previa si hay imagen válida */}
+          {hasValidImage && (
+            <div className="form__image-wrapper">
+              <img
+                className="form__image-preview"
+                src={form.imagen}
+                alt="Vista previa de perfil"
+                onError={() => setImgError(true)}
+              />
+              <button
+                type="button"
+                className="form__image-remove"
+                onClick={handleRemoveImage}
+                title="Eliminar imagen"
+              >
+                ✕
+              </button>
+            </div>
+          )}
+
+          {/* Si la URL falló al cargar */}
+          {imgError && (
+            <p className="form__error">No se pudo cargar la imagen. Verifica la URL o sube un archivo.</p>
+          )}
+
+          {/* Subir desde archivo */}
+          <label className="form__file-label" htmlFor="imagen-file">
+            📁 Subir desde mi equipo
+            <input
+              className="form__file-input"
+              id="imagen-file"
+              type="file"
+              accept="image/*"
+              onChange={handleFileChange}
+            />
+          </label>
+
+          <p className="form__hint">— o pega una URL —</p>
+
           <input
             className={`form__input ${errors.imagen ? "form__input--error" : ""}`}
             id="imagen"
             name="imagen"
             placeholder="https://ejemplo.com/foto.jpg"
-            value={form.imagen}
+            value={isBase64 ? "" : form.imagen}
             onChange={handleChange}
+            disabled={isBase64}
           />
-          {errors.imagen && <p className="form__error">{errors.imagen}</p>}
-          {form.imagen && !errors.imagen && (
-            <img className="form__image-preview" src={form.imagen} alt="Vista previa" />
+          {isBase64 && (
+            <p className="form__hint">Imagen cargada desde archivo. Elimínala para usar una URL.</p>
           )}
+          {errors.imagen && <p className="form__error">{errors.imagen}</p>}
         </div>
 
         <button className="form__button form__button--primary" type="submit">

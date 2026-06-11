@@ -8,6 +8,9 @@ import Dashboard from "./pages/Dashboard";
 import Preview from "./pages/Preview";
 import About from "./pages/About";
 
+import "./App.css";   // ← agregar esta línea (aunque esté vacío, no rompe nada)
+import "./index.css"; // ← esta ya debes tenerla en main.jsx
+
 function App() {
   return (
     <BrowserRouter>
