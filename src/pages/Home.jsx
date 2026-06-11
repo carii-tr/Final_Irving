@@ -1,19 +1,16 @@
 import { Link } from "react-router-dom";
 
 function Home() {
-
   return (
-    <div>
+    <div className="container">
 
-      <h1>
-        DevProfile
-      </h1>
+      <h1 className="title">DevProfile</h1>
 
-      <p>
+      <p className="subtitle">
         Generador Dinámico de CV
       </p>
 
-      <Link to="/editor">
+      <Link className="btn btn-primary" to="/editor">
         Comenzar
       </Link>
 

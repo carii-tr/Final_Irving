@@ -1,13 +1,18 @@
 import SkillChart from "../components/SkillChart";
 
 function Dashboard() {
-
   return (
-    <div>
+    <div className="container">
 
-      <h1>Dashboard</h1>
+      <h1 className="title">Dashboard</h1>
 
-      <SkillChart />
+      <p className="subtitle">
+        Resumen de habilidades
+      </p>
+
+      <div className="card">
+        <SkillChart />
+      </div>
 
     </div>
   );

@@ -1,109 +1,118 @@
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import { CVContext } from "../context/CVContext";
+import useFormValidation from "../hooks/useFormValidation";
 
 function PersonalForm() {
-
   const { cvData, setCvData } = useContext(CVContext);
+  const { validate } = useFormValidation();
+
+  const [form, setForm] = useState(cvData.personal);
+  const [errors, setErrors] = useState({});
 
   const handleChange = (e) => {
-
-    const { name, value } = e.target;
-
-    setCvData({
-      ...cvData,
-
-      personal: {
-        ...cvData.personal,
-        [name]: value
-      }
+    setForm({
+      ...form,
+      [e.target.name]: e.target.value
     });
   };
 
-  return (
-    <div>
+  const handleSubmit = (e) => {
+    e.preventDefault();
 
-      <h2>Datos Personales</h2>
+    const validationErrors = validate("personal", form);
+    setErrors(validationErrors);
+
+    if (Object.keys(validationErrors).length > 0) return;
+
+    setCvData(prev => ({
+      ...prev,
+      personal: form
+    }));
+  };
+
+  return (
+    <form className="form form--personal" onSubmit={handleSubmit}>
+      <h2 className="form__title">Datos personales</h2>
 
       <input
-        type="text"
+        className="form__input"
         name="nombre"
-        placeholder="Nombre completo"
-        value={cvData.personal.nombre}
+        placeholder="Nombre"
+        value={form.nombre}
         onChange={handleChange}
       />
+      {errors.nombre && <p className="form__error">{errors.nombre}</p>}
 
       <input
-        type="text"
+        className="form__input"
         name="profesion"
         placeholder="Profesión"
-        value={cvData.personal.profesion}
+        value={form.profesion}
         onChange={handleChange}
       />
+      {errors.profesion && <p className="form__error">{errors.profesion}</p>}
 
       <input
-        type="text"
+        className="form__input"
         name="ciudad"
         placeholder="Ciudad"
-        value={cvData.personal.ciudad}
+        value={form.ciudad}
         onChange={handleChange}
       />
 
       <input
-        type="email"
+        className="form__input"
         name="correo"
         placeholder="Correo"
-        value={cvData.personal.correo}
+        value={form.correo}
         onChange={handleChange}
       />
+      {errors.correo && <p className="form__error">{errors.correo}</p>}
 
       <input
-        type="text"
+        className="form__input"
         name="telefono"
         placeholder="Teléfono"
-        value={cvData.personal.telefono}
+        value={form.telefono}
         onChange={handleChange}
       />
 
       <textarea
+        className="form__textarea"
         name="descripcion"
-        placeholder="Perfil profesional"
-        value={cvData.personal.descripcion}
+        placeholder="Descripción"
+        value={form.descripcion}
         onChange={handleChange}
       />
 
       <input
-        type="url"
+        className="form__input"
         name="github"
         placeholder="GitHub"
-        value={cvData.personal.github}
+        value={form.github}
         onChange={handleChange}
       />
 
       <input
-        type="url"
+        className="form__input"
         name="linkedin"
         placeholder="LinkedIn"
-        value={cvData.personal.linkedin}
+        value={form.linkedin}
         onChange={handleChange}
       />
 
       <input
-        type="url"
+        className="form__input"
         name="imagen"
-        placeholder="URL de imagen"
-        value={cvData.personal.imagen}
+        placeholder="URL imagen"
+        value={form.imagen}
         onChange={handleChange}
       />
 
-      {cvData.personal.imagen && (
-        <img
-          src={cvData.personal.imagen}
-          alt="Perfil"
-          width="120"
-        />
-      )}
-
-    </div>
+      <button className="form__button" type="submit">
+        Guardar
+      </button>
+    </form>
   );
 }
 

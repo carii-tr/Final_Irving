@@ -1,4 +1,5 @@
-import { createContext, useEffect, useState } from "react";
+import { createContext } from "react";
+import { useLocalStorage } from "../hooks/useLocalStorage";
 
 export const CVContext = createContext();
 
@@ -21,19 +22,10 @@ const initialCVData = {
 };
 
 export const CVProvider = ({ children }) => {
-
-  const [cvData, setCvData] = useState(() => {
-    try {
-      const saved = localStorage.getItem("cvData");
-      return saved ? JSON.parse(saved) : initialCVData;
-    } catch (err) {
-      return initialCVData;
-    }
-  });
-
-  useEffect(() => {
-    localStorage.setItem("cvData", JSON.stringify(cvData));
-  }, [cvData]);
+  const [cvData, setCvData] = useLocalStorage(
+    "cvData",
+    initialCVData
+  );
 
   return (
     <CVContext.Provider value={{ cvData, setCvData }}>

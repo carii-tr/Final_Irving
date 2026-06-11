@@ -1,136 +1,116 @@
 import { useContext, useState } from "react";
 import { CVContext } from "../context/CVContext";
-import { v4 as uuidv4 } from "uuid";
+import useFormValidation from "../hooks/useFormValidation";
+import { v4 as uuid } from "uuid";
 
 function SkillForm() {
-
   const { cvData, setCvData } = useContext(CVContext);
+  const { validate } = useFormValidation();
 
-  const [nombre, setNombre] = useState("");
-  const [categoria, setCategoria] = useState("");
-  const [nivel, setNivel] = useState("");
-  const [descripcion, setDescripcion] = useState("");
+  const [form, setForm] = useState({
+    nombre: "",
+    categoria: "",
+    nivel: 50,
+    descripcion: ""
+  });
 
-  const handleSubmit = (e) => {
+  const [editingId, setEditingId] = useState(null);
+  const [errors, setErrors] = useState({});
 
+  const handleChange = (e) => {
+    setForm({
+      ...form,
+      [e.target.name]: e.target.value
+    });
+  };
+
+  const resetForm = () => {
+    setForm({
+      nombre: "",
+      categoria: "",
+      nivel: 50,
+      descripcion: ""
+    });
+    setEditingId(null);
+    setErrors({});
+  };
+
+  const addSkill = (e) => {
     e.preventDefault();
 
-    const duplicate = cvData.skills.find(
-      skill =>
-        skill.nombre.toLowerCase() ===
-        nombre.toLowerCase()
-    );
+    const validationErrors = validate("skill", form, cvData.skills);
+    setErrors(validationErrors);
+    if (Object.keys(validationErrors).length > 0) return;
 
-    if (duplicate) {
-      alert("La habilidad ya existe");
-      return;
-    }
+    setCvData(prev => ({
+      ...prev,
+      skills: [...prev.skills, { id: uuid(), ...form, nivel: Number(form.nivel) }]
+    }));
 
-    const nuevaSkill = {
-      id: uuidv4(),
-      nombre,
-      categoria,
-      nivel: Number(nivel),
-      descripcion
-    };
+    resetForm();
+  };
 
-    setCvData({
-      ...cvData,
-      skills: [...cvData.skills, nuevaSkill]
-    });
+  const editSkill = (skill) => {
+    setForm(skill);
+    setEditingId(skill.id);
+  };
 
-    setNombre("");
-    setCategoria("");
-    setNivel("");
-    setDescripcion("");
+  const updateSkill = (e) => {
+    e.preventDefault();
+
+    const validationErrors = validate("skill", form, cvData.skills);
+    setErrors(validationErrors);
+    if (Object.keys(validationErrors).length > 0) return;
+
+    setCvData(prev => ({
+      ...prev,
+      skills: prev.skills.map(s =>
+        s.id === editingId ? { ...s, ...form, nivel: Number(form.nivel) } : s
+      )
+    }));
+
+    resetForm();
   };
 
   const deleteSkill = (id) => {
-
-    setCvData({
-      ...cvData,
-      skills: cvData.skills.filter(
-        skill => skill.id !== id
-      )
-    });
+    setCvData(prev => ({
+      ...prev,
+      skills: prev.skills.filter(s => s.id !== id)
+    }));
   };
 
   return (
-    <div>
+    <div className="form-section">
+      <form className="form form--skills" onSubmit={editingId ? updateSkill : addSkill}>
+        <h2 className="form__title">Skills</h2>
 
-      <h2>Habilidades</h2>
+        <input className="form__input" name="nombre" value={form.nombre} onChange={handleChange} />
+        {errors.nombre && <p className="form__error">{errors.nombre}</p>}
 
-      <form onSubmit={handleSubmit}>
+        <input className="form__input" name="categoria" value={form.categoria} onChange={handleChange} />
 
-        <input
-          type="text"
-          placeholder="Nombre"
-          value={nombre}
-          onChange={(e) =>
-            setNombre(e.target.value)
-          }
-        />
+        <input className="form__input" name="nivel" type="number" value={form.nivel} onChange={handleChange} />
+        {errors.nivel && <p className="form__error">{errors.nivel}</p>}
 
-        <input
-          type="text"
-          placeholder="Categoría"
-          value={categoria}
-          onChange={(e) =>
-            setCategoria(e.target.value)
-          }
-        />
+        <input className="form__input" name="descripcion" value={form.descripcion} onChange={handleChange} />
 
-        <input
-          type="number"
-          placeholder="Nivel"
-          min="1"
-          max="100"
-          value={nivel}
-          onChange={(e) =>
-            setNivel(e.target.value)
-          }
-        />
-
-        <textarea
-          placeholder="Descripción"
-          value={descripcion}
-          onChange={(e) =>
-            setDescripcion(e.target.value)
-          }
-        />
-
-        <button type="submit">
-          Agregar habilidad
+        <button className="form__button" type="submit">
+          {editingId ? "Actualizar" : "Agregar"}
         </button>
-
       </form>
 
-      <hr />
+      <div className="list list--skills">
+        {cvData.skills.map(s => (
+          <div className="list__item" key={s.id}>
+            <span>{s.nombre} - {s.nivel}%</span>
 
-      {cvData.skills.map((skill) => (
-
-        <div key={skill.id}>
-
-          <h4>{skill.nombre}</h4>
-
-          <p>{skill.categoria}</p>
-
-          <p>{skill.nivel}%</p>
-
-          <p>{skill.descripcion}</p>
-
-          <button
-            onClick={() =>
-              deleteSkill(skill.id)
-            }
-          >
-            Eliminar
-          </button>
-
-        </div>
-
-      ))}
-
+            <div className="list__actions">
+              <button onClick={() => editSkill(s)}>Editar</button>
+              <button onClick={() => deleteSkill(s.id)}>Eliminar</button>
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }

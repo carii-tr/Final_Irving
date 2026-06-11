@@ -1,5 +1,8 @@
 function About() {
-  return <h1>About</h1>;
+  <div className="layout-container center">
+  <h1>DevProfile</h1>
+  <p>Generador de CV</p>
+</div>
 }
 
 export default About;

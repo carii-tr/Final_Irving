@@ -6,22 +6,30 @@ import LanguageForm from "../components/LanguageForm";
 
 function Editor() {
   return (
-    <div>
-      <h1>Editor del CV</h1>
+    <div className="container">
 
-      <PersonalForm />
-      <hr />
+      <h1 className="title">Editor del CV</h1>
 
-      <SkillForm />
-      <hr />
+      <section className="section">
+        <PersonalForm />
+      </section>
 
-      <ProjectForm />
-      <hr />
+      <section className="section">
+        <SkillForm />
+      </section>
 
-      <EducationForm />
-      <hr />
+      <section className="section">
+        <ProjectForm />
+      </section>
 
-      <LanguageForm />
+      <section className="section">
+        <EducationForm />
+      </section>
+
+      <section className="section">
+        <LanguageForm />
+      </section>
+
     </div>
   );
 }

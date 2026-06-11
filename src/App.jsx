@@ -1,24 +1,32 @@
-import { Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+
+import Navbar from "./components/Navbar";
 
 import Home from "./pages/Home";
 import Editor from "./pages/Editor";
-import Preview from "./pages/Preview";
 import Dashboard from "./pages/Dashboard";
+import Preview from "./pages/Preview";
 import About from "./pages/About";
 
 function App() {
   return (
-    <Routes>
-      <Route path="/" element={<Home />} />
+    <BrowserRouter>
+      <div className="container">
 
-      <Route path="/editor" element={<Editor />} />
+        <Navbar />
 
-      <Route path="/preview" element={<Preview />} />
+        <main className="container-content">
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/editor" element={<Editor />} />
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/preview" element={<Preview />} />
+            <Route path="/about" element={<About />} />
+          </Routes>
+        </main>
 
-      <Route path="/dashboard" element={<Dashboard />} />
-
-      <Route path="/about" element={<About />} />
-    </Routes>
+      </div>
+    </BrowserRouter>
   );
 }
 

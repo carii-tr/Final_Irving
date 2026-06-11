@@ -6,39 +6,39 @@ import {
   Bar,
   XAxis,
   YAxis,
-  CartesianGrid,
-  Tooltip
+  Tooltip,
+  ResponsiveContainer,
+  CartesianGrid
 } from "recharts";
 
 function SkillChart() {
-
   const { cvData } = useContext(CVContext);
 
-  console.log(cvData.skills);
+  const data = cvData.skills.map((skill) => ({
+    name: skill.nombre,
+    nivel: skill.nivel
+  }));
 
   return (
-    <div>
-
+    <div style={{ width: "100%", height: 300 }}>
       <h2>Gráfica de Habilidades</h2>
 
-      <BarChart
-        width={700}
-        height={400}
-        data={cvData.skills}
-      >
-        <CartesianGrid strokeDasharray="3 3" />
+      {data.length === 0 ? (
+        <p>No hay habilidades para mostrar</p>
+      ) : (
+        <ResponsiveContainer width="100%" height="100%">
+          <BarChart data={data}>
+            <CartesianGrid strokeDasharray="3 3" />
 
-        <XAxis dataKey="nombre" />
+            <XAxis dataKey="name" />
+            <YAxis domain={[0, 100]} />
 
-        <YAxis />
+            <Tooltip />
 
-        <Tooltip />
-
-        <Bar
-          dataKey="nivel"
-        />
-      </BarChart>
-
+            <Bar dataKey="nivel" fill="#4f46e5" />
+          </BarChart>
+        </ResponsiveContainer>
+      )}
     </div>
   );
 }
