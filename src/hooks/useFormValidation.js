@@ -61,8 +61,8 @@ export default function useFormValidation() {
         errors.linkedin = "El enlace debe comenzar con http:// o https://";
       }
 
-      if (form.imagen && !isUrl(form.imagen)) {
-        errors.imagen = "La URL de imagen debe comenzar con http:// o https://";
+      if (form.imagen && !isUrl(form.imagen) && !form.imagen.startsWith("data:image/")) {
+        errors.imagen = "La imagen debe ser una URL válida o una imagen subida desde tu equipo.";
       }
     }
 

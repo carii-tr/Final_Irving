@@ -409,15 +409,7 @@ ul {
   margin-top: var(--space-2);
 }
 
-/* Vista previa imagen en PersonalForm */
-.form__image-preview {
-  width: 72px;
-  height: 72px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 2px solid var(--color-accent);
-  margin-top: var(--space-2);
-}
+/* .form__image-preview → ver sección IMAGEN DE PERFIL */
 
 .form__error {
   font-size: 13px;
@@ -1011,4 +1003,157 @@ ul {
   .page__actions {
     flex-direction: column;
   }
+}
+
+/* ── IMAGEN DE PERFIL (PersonalForm) ────────────────────── */
+.form__image-wrapper {
+  position: relative;
+  display: inline-block;
+  margin-bottom: var(--space-3);
+}
+
+.form__image-preview {
+  width: 88px;
+  height: 88px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid var(--color-accent);
+  display: block;
+}
+
+.form__image-remove {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background-color: var(--color-error);
+  color: #fff;
+  border: none;
+  font-size: 11px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  transition: background-color 0.2s;
+}
+.form__image-remove:hover {
+  background-color: #b91c1c;
+}
+
+.form__file-label {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-4);
+  background-color: var(--color-surface);
+  border: 1px dashed var(--color-border);
+  border-radius: var(--radius-md);
+  font-size: 14px;
+  color: var(--color-text);
+  cursor: pointer;
+  transition: background-color 0.2s, border-color 0.2s;
+  margin-bottom: var(--space-2);
+}
+.form__file-label:hover {
+  background-color: var(--color-accent-light);
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+}
+
+.form__file-input {
+  display: none;
+}
+
+.form__hint {
+  font-size: 12px;
+  color: var(--color-text-muted);
+  margin-bottom: var(--space-2);
+  text-align: center;
+}
+
+/* ── TABS IMAGEN DE PERFIL ──────────────────────────────── */
+.form__label-optional {
+  font-weight: 400;
+  font-size: 12px;
+  color: var(--color-text-muted);
+  text-transform: none;
+  letter-spacing: 0;
+  margin-left: var(--space-1);
+}
+
+.img-tabs {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.img-tabs__header {
+  display: flex;
+  border-bottom: 1px solid var(--color-border);
+  background-color: var(--color-surface);
+}
+
+.img-tabs__tab {
+  flex: 1;
+  padding: var(--space-2) var(--space-3);
+  font-size: 13px;
+  font-weight: 500;
+  font-family: var(--font-sans);
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--color-text-muted);
+  transition: background-color 0.2s, color 0.2s;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+}
+.img-tabs__tab:hover {
+  color: var(--color-heading);
+  background-color: var(--color-bg);
+}
+.img-tabs__tab--active {
+  color: var(--color-accent);
+  background-color: var(--color-bg);
+  border-bottom-color: var(--color-accent);
+  font-weight: 600;
+}
+
+.img-tabs__body {
+  padding: var(--space-4);
+  background-color: var(--color-bg);
+}
+
+/* Archivo label dentro del tab */
+.form__file-label {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  padding: var(--space-5) var(--space-4);
+  background-color: var(--color-bg-subtle);
+  border: 2px dashed var(--color-border);
+  border-radius: var(--radius-md);
+  font-size: 14px;
+  color: var(--color-text);
+  cursor: pointer;
+  transition: background-color 0.2s, border-color 0.2s;
+  text-align: center;
+}
+.form__file-label:hover {
+  background-color: var(--color-accent-light);
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+}
+
+.form__file-hint {
+  font-size: 12px;
+  color: var(--color-text-muted);
+}
+
+.form__file-input {
+  display: none;
 }
